@@ -3,22 +3,30 @@ var React = require('react');
 
 
 var ChildDayTimeEntry = React.createClass({
-	getDefaultProps: function() {
+	getInitialState: function() {
 		return {
-			display: "block"
+			display: "block",
+			startValue: null,
+			endValue: null
 		}
 	},
 	render: function() {
-		return (<div className="container" style={{display: this.props.display}}>
+		return (<div className="container" style={{display: this.state.display, border: "1px black solid"}}>
 					<div className="row">
 						<div className='col-sm-6'>
-							<b>Unavailable from:</b>
+							<button onClick={this.deleteClick}>Remove</button>
 						</div>
 					</div>
 
 					<div className="row">
 						<div className='col-sm-6'>
-							<button onClick={this.deleteClick}>Delete</button>
+							<button onClick={this.setUnavailableAllDayClick}>Unavailable all day</button>
+						</div>
+					</div>
+
+					<div className="row">
+						<div className='col-sm-6'>
+							<b>Unavailable from {this.props.day} at</b>
 						</div>
 					</div>
 
@@ -26,7 +34,7 @@ var ChildDayTimeEntry = React.createClass({
 						<div className='col-sm-6'>
 							<div className="form-group">
 								<div className='input-group date datetimepicker'>
-									<input type='text' className="form-control" />
+									<input type='text' value={this.state.startValue} onChange={this.handleStartChange} className="form-control" />
 									<span className="input-group-addon"><span className="glyphicon glyphicon-time"></span>
 									</span>
 								</div>
@@ -36,7 +44,7 @@ var ChildDayTimeEntry = React.createClass({
 
 					<div className="row">
 						<div className='col-sm-6'>
-							<b>to:</b>
+							<b>Until {this.props.day} at</b>
 						</div>
 					</div>
 
@@ -44,7 +52,7 @@ var ChildDayTimeEntry = React.createClass({
 						<div className='col-sm-6'>
 							<div className="form-group">
 								<div className='input-group date datetimepicker'>
-									<input type='text' className="form-control" />
+									<input type='text' value={this.state.endValue} onChange={this.handleEndChange} className="form-control" />
 									<span className="input-group-addon"><span className="glyphicon glyphicon-time"></span>
 									</span>
 								</div>
@@ -54,14 +62,23 @@ var ChildDayTimeEntry = React.createClass({
 				</div>);
 	},
 	deleteClick: function() {
-		this.setProps({display: "none"});
+		this.setState({display: "none"});
+	},
+	setUnavailableAllDayClick: function() {
+
+	},
+	handleStartChange: function(event) {
+		event.target.value
+	},
+	handleEndChange: function(event) {
+		event.target.value
 	}
 });
 
 var DayTimeEntry = React.createClass({
-	myRows: [<ChildDayTimeEntry key={0} />],
 	getInitialState: function() {
 		return {
+			myRows: [<ChildDayTimeEntry day={this.props.day} key={this.props.day + "1"} />],
 			clicked: false,
 			childCounter: 1
 		}
@@ -69,8 +86,8 @@ var DayTimeEntry = React.createClass({
 	render: function() {
 		if (this.state.clicked) {
 			return (<div style={{backgroundColor: "#C0C0C0", padding: "8px"}} className="container">
-						<b>test {this.props.name}</b>
-						{this.myRows}
+						<b>Nonavailability for {this.props.day}</b>
+						{this.state.myRows}
 
 						<div className="row">
 							<div className='col-sm-6'>
@@ -93,7 +110,8 @@ var DayTimeEntry = React.createClass({
 		if (!this.state.clicked) {
 			this.setState({clicked: true});
 		} else {
-			this.myRows.push(<ChildDayTimeEntry key={this.props.day + this.state.childCounter + 1} />);
+			console.log(this.props.day + parseInt(parseInt(this.state.childCounter) + 1));
+			this.state.myRows.push(<ChildDayTimeEntry day={this.props.day} key={this.props.day + parseInt(parseInt(this.state.childCounter) + 1)} />);
 			this.setState({childCounter: this.state.childCounter + 1});
 		}
 
